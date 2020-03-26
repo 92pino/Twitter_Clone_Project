@@ -22,7 +22,7 @@ class LoginController: UIViewController {
     
     private lazy var emailContainerView: UIView = {
         let image = #imageLiteral(resourceName: "ic_mail_outline_white_2x-1")
-        let view = Utilities().inputContainerView(withImage: image, textField: eamilTextField)
+        let view = Utilities().inputContainerView(withImage: image, textField: emailTextField)
         
         return view
     }()
@@ -34,7 +34,7 @@ class LoginController: UIViewController {
         return view
     }()
     
-    private let eamilTextField: UITextField = {
+    private let emailTextField: UITextField = {
         let tf = Utilities().textField(withPlaceholder: "Email")
         
         return tf
@@ -77,11 +77,12 @@ class LoginController: UIViewController {
     // MARK: - Slectors
     
     @objc func handleShowSignUp() {
-        print("Handle Show SignUp...")
+        let controller = RegistrationController()
+        navigationController?.pushViewController(controller, animated: true)
     }
     
     @objc func handleLogin() {
-        
+        print("Handle login here...")
     }
     
     // MARK: - Helpers
