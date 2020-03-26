@@ -12,25 +12,59 @@ class MainTabController: UITabBarController {
 
     // MARK: - Properties
     
+    let actionButton: UIButton = {
+        let button = UIButton(type: .system)
+        button.tintColor = .white
+        button.backgroundColor = .twitterBlue
+        button.setImage(UIImage(named: "new_tweet"), for: .normal)
+        
+        return button
+    }()
+    
     // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
 
         configureViewControllers()
+        configuerUI()
     }
 
     // MARK: - Helpers
+    
+    func configuerUI() {
+        view.addSubview(actionButton)
+        
+        actionButton.translatesAutoresizingMaskIntoConstraints = false
+        actionButton.heightAnchor.constraint(equalToConstant: 56).isActive = true
+        actionButton.widthAnchor.constraint(equalToConstant: 56).isActive = true
+        actionButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -64).isActive = true
+        actionButton.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -16).isActive = true
+        actionButton.layer.cornerRadius = 56 / 2
+    }
+    
     func configureViewControllers() {
         
         let feed = FeedController()
-        feed.tabBarItem.image = UIImage(named: "home_unselected")
-        let explore = ExploreController()
-        explore.tabBarItem.image = UIImage(named: "search_unselected")
-        let notifications = NotificationsController()
-        notifications.tabBarItem.image = UIImage(named: "like_unselected")
-        let conversations = ConversationsController()
-        conversations.tabBarItem.image = UIImage(named: "ic_mail_outline_white_2x")
+        let nav1 = templateNavigationController(image: UIImage(named: "home_unselected"), rootViewController: feed)
         
-        viewControllers = [feed, explore, notifications, conversations]
+        let explore = ExploreController()
+        let nav2 = templateNavigationController(image: UIImage(named: "search_unselected"), rootViewController: explore)
+        
+        let notifications = NotificationsController()
+        let nav3 = templateNavigationController(image: UIImage(named: "like_unselected"), rootViewController: notifications)
+        
+        let conversations = ConversationsController()
+        let nav4 = templateNavigationController(image: UIImage(named: "ic_mail_outline_white_2x-1"), rootViewController: conversations)
+        
+        viewControllers = [nav1, nav2, nav3, nav4]
+    }
+    
+    func templateNavigationController(image: UIImage?, rootViewController: UIViewController) -> UINavigationController {
+        
+        let nav = UINavigationController(rootViewController: rootViewController)
+        nav.tabBarItem.image = image
+        nav.navigationBar.barTintColor = .white
+        return nav
+        
     }
 }
