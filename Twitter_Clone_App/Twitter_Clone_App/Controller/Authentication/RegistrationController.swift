@@ -10,8 +10,9 @@ import UIKit
 import Firebase
 
 class RegistrationController: UIViewController {
-
+    
     // MARK: - Properties
+    
     private let imagePicker = UIImagePickerController()
     private var profileImage: UIImage?
     
@@ -20,67 +21,57 @@ class RegistrationController: UIViewController {
         button.setImage(UIImage(named: "plus_photo"), for: .normal)
         button.tintColor = .white
         button.addTarget(self, action: #selector(handleAddProfilePhoto), for: .touchUpInside)
-        
         return button
     }()
     
     private lazy var emailContainerView: UIView = {
         let image = #imageLiteral(resourceName: "ic_mail_outline_white_2x-1")
         let view = Utilities().inputContainerView(withImage: image, textField: emailTextField)
-        
         return view
     }()
     
     private lazy var passwordContainerView: UIView = {
         let image = #imageLiteral(resourceName: "ic_lock_outline_white_2x")
         let view = Utilities().inputContainerView(withImage: image, textField: passwordTextField)
-        
         return view
     }()
     
     private lazy var fullnameContainerView: UIView = {
         let image = #imageLiteral(resourceName: "ic_mail_outline_white_2x-1")
         let view = Utilities().inputContainerView(withImage: image, textField: fullnameTextField)
-        
         return view
     }()
     
     private lazy var usernameContainerView: UIView = {
         let image = #imageLiteral(resourceName: "ic_lock_outline_white_2x")
         let view = Utilities().inputContainerView(withImage: image, textField: usernameTextField)
-        
         return view
     }()
     
     private let emailTextField: UITextField = {
         let tf = Utilities().textField(withPlaceholder: "Email")
-        
         return tf
     }()
     
     private let passwordTextField: UITextField = {
         let tf = Utilities().textField(withPlaceholder: "Password")
         tf.isSecureTextEntry = true
-        
         return tf
     }()
     
     private let fullnameTextField: UITextField = {
         let tf = Utilities().textField(withPlaceholder: "Full Name")
-        
         return tf
     }()
     
     private let usernameTextField: UITextField = {
-        let tf = Utilities().textField(withPlaceholder: "User Name")
-        
+        let tf = Utilities().textField(withPlaceholder: "Username")
         return tf
     }()
-
+    
     private let alreadyHaveAccountButton: UIButton = {
-        let button = Utilities().attributedButton("Already Have an account?", " Log In")
+        let button = Utilities().attributedButton("Already have an account?", " Log In")
         button.addTarget(self, action: #selector(handleShowLogin), for: .touchUpInside)
-        
         return button
     }()
     
@@ -89,22 +80,22 @@ class RegistrationController: UIViewController {
         button.setTitle("Sign Up", for: .normal)
         button.setTitleColor(.twitterBlue, for: .normal)
         button.backgroundColor = .white
-        button.heightAnchor.constraint(lessThanOrEqualToConstant: 50).isActive = true
+        button.heightAnchor.constraint(equalToConstant: 50).isActive = true
         button.layer.cornerRadius = 5
         button.titleLabel?.font = UIFont.boldSystemFont(ofSize: 20)
         button.addTarget(self, action: #selector(handleRegistration), for: .touchUpInside)
-        
         return button
     }()
-
+    
     // MARK: - Lifecycle
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-
         configureUI()
     }
     
-    // MARK: - Slectors
+    // MARK: - Selectors
+    
     @objc func handleAddProfilePhoto() {
         present(imagePicker, animated: true, completion: nil)
     }
@@ -117,23 +108,18 @@ class RegistrationController: UIViewController {
         guard let email = emailTextField.text else { return }
         guard let password = passwordTextField.text else { return }
         guard let fullname = fullnameTextField.text else { return }
-        guard let username = usernameTextField.text else { return }
+        guard let username = usernameTextField.text?.lowercased() else { return }
         
-        Auth.auth().createUser(withEmail: email, password: password) { (result, error) in
-            if let error = error {
-                print("DEBUG : Error is \(error.localizedDescription)")
-                return
-            }
+        let credentials = AuthCredentials(email: email, password: password, fullname: fullname,
+                                          username: username, profileImage: profileImage)
+        
+        AuthService.shared.registerUser(credentials: credentials) { (error, ref) in
+            guard let window = UIApplication.shared.windows.first(where: { $0.isKeyWindow }) else { return }
+            guard let tab = window.rootViewController as? MainTabController else { return }
             
-            guard let uid = result?.user.uid else { return }
+            tab.authenticateUserAndConfigureUI()
             
-            let values = ["email": email, "username": username, "fullname": fullname]
-            
-            let ref = Database.database().reference().child("users").child(uid)
-            
-            ref.updateChildValues(values) { (error, ref) in
-                print("DEBUG : Successfully updated user information..")
-            }
+            self.dismiss(animated: true, completion: nil)
         }
     }
     
@@ -142,6 +128,7 @@ class RegistrationController: UIViewController {
     }
     
     // MARK: - Helpers
+    
     func configureUI() {
         view.backgroundColor = .twitterBlue
         
@@ -171,7 +158,6 @@ class RegistrationController: UIViewController {
                                      bottom: view.safeAreaLayoutGuide.bottomAnchor,
                                      right: view.rightAnchor, paddingLeft: 40, paddingRight: 40)
     }
-
 }
 
 // MARK: - UIImagePickerControllerDelegate
