@@ -9,11 +9,12 @@
 import Foundation
 
 struct User {
-    let fullname: String
+    var fullname: String
     let email: String
-    let username: String
+    var username: String
     var profileImageUrl: URL?
     let uid: String
+    var isFollowed = false
     
     init(uid: String, dictionary: [String: AnyObject]) {
         self.uid = uid
